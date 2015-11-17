@@ -1,0 +1,7 @@
+nuno_jobeet:
+    resource: "@NunoJobeetBundle/Resources/config/routing.yml"
+    prefix:   /
+
+app:
+    resource: "@AppBundle/Controller/"
+    type:     annotation
