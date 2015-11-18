@@ -1,0 +1,30 @@
+nuno_job:
+    path:     /
+    defaults: { _controller: "NunoJobeetBundle:Job:index" }
+
+nuno_job_show:
+    path:     /{id}/show
+    defaults: { _controller: "NunoJobeetBundle:Job:show" }
+
+nuno_job_new:
+    path:     /new
+    defaults: { _controller: "NunoJobeetBundle:Job:new" }
+
+nuno_job_create:
+    path:     /create
+    defaults: { _controller: "NunoJobeetBundle:Job:create" }
+    methods:  POST
+
+nuno_job_edit:
+    path:     /{id}/edit
+    defaults: { _controller: "NunoJobeetBundle:Job:edit" }
+
+nuno_job_update:
+    path:     /{id}/update
+    defaults: { _controller: "NunoJobeetBundle:Job:update" }
+    methods:  [POST, PUT]
+
+nuno_job_delete:
+    path:     /{id}/delete
+    defaults: { _controller: "NunoJobeetBundle:Job:delete" }
+    methods:  [POST, DELETE]
