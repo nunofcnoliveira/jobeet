@@ -486,9 +486,7 @@ class Job
     {
         return $this->category;
     }
-    /**
-     * @ORM\PrePersist
-     */
+
     public function setCreatedAtValue()
     {
         if(!$this->getCreatedAt()) {
@@ -496,9 +494,6 @@ class Job
         }
     }
 
-    /**
-     * @ORM\PreUpdate
-     */
     public function setUpdatedAtValue()
     {
         $this->updated_at = new \DateTime();
