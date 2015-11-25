@@ -143,3 +143,4 @@ class Category
         return $this->getName() ? $this->getName() : "";
     }
 }
+

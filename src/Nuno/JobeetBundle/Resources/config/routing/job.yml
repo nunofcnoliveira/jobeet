@@ -3,7 +3,7 @@ nuno_job:
     defaults: { _controller: "NunoJobeetBundle:Job:index" }
 
 nuno_job_show:
-    path:     /{id}/show
+    pattern:  /{company}/{location}/{id}/{position}
     defaults: { _controller: "NunoJobeetBundle:Job:show" }
 
 nuno_job_new:

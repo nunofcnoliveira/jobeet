@@ -2,9 +2,13 @@
 #    resource: "@NunoJobeetBundle/Resources/config/routing/job.yml"
 #    prefix:   /nuno_job
 
+#nuno_jobeet_homepage:
+#    path:     /hello/{name}
+#    defaults: { _controller: NunoJobeetBundle:Default:index }
+
 nuno_jobeet_homepage:
-    path:     /hello/{name}
-    defaults: { _controller: NunoJobeetBundle:Default:index }
+    pattern:  /
+    defaults: { _controller: NunoJobeetBundle:Job:index }
 
 NunoJobeetBundle_job:
     resource: "@NunoJobeetBundle/Resources/config/routing/job.yml"
