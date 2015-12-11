@@ -1,5 +1,6 @@
 Nuno\JobeetBundle\Entity\Category:
     type: entity
+    repositoryClass: Nuno\JobeetBundle\Repository\CategoryRepository
     table: category
     id:
         id:

@@ -14,211 +14,217 @@ use Nuno\JobeetBundle\Form\JobType;
  */
 class JobController extends Controller
 {
+	/**
+	 * Lists all Job entities.
+	 *
+	 */
+	public function indexAction()
+	{
+		$em = $this->getDoctrine()->getManager();
 
-    /**
-     * Lists all Job entities.
-     *
-     */
-    public function indexAction()
-    {
-        $em = $this->getDoctrine()->getManager();
+		$categories = $em->getRepository('NunoJobeetBundle:Category')->getWithJobs();
 
-        $entities = $em->getRepository('NunoJobeetBundle:Job')->findAll();
+		foreach($categories as $category) {
+			$category->setActiveJobs($em->getRepository('NunoJobeetBundle:Job')->getActiveJobs($category->getId(), $this->container->getParameter('max_jobs_on_homepage')));
+		}
 
-        return $this->render('NunoJobeetBundle:Job:index.html.twig', array(
-            'entities' => $entities,
-        ));
-    }
-    /**
-     * Creates a new Job entity.
-     *
-     */
-    public function createAction(Request $request)
-    {
-        $entity = new Job();
-        $form = $this->createCreateForm($entity);
-        $form->handleRequest($request);
+		return $this->render('NunoJobeetBundle:Job:index.html.twig', array(
+			'categories' => $categories
+		));
+	}
 
-        if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($entity);
-            $em->flush();
+	/**
+	 * Creates a new Job entity.
+	 *
+	 */
+	public function createAction(Request $request)
+	{
+		$entity = new Job();
+		$form = $this->createCreateForm($entity);
+		$form->handleRequest($request);
 
-            return $this->redirect($this->generateUrl('nuno_job_show', array('id' => $entity->getId())));
-        }
+		if ($form->isValid()) {
+			$em = $this->getDoctrine()->getManager();
+			$em->persist($entity);
+			$em->flush();
 
-        return $this->render('NunoJobeetBundle:Job:new.html.twig', array(
-            'entity' => $entity,
-            'form'   => $form->createView(),
-        ));
-    }
+			return $this->redirect($this->generateUrl('nuno_job_show', array('id' => $entity->getId())));
+		}
 
-    /**
-     * Creates a form to create a Job entity.
-     *
-     * @param Job $entity The entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createCreateForm(Job $entity)
-    {
-        $form = $this->createForm(new JobType(), $entity, array(
-            'action' => $this->generateUrl('nuno_job_create'),
-            'method' => 'POST',
-        ));
+		return $this->render('NunoJobeetBundle:Job:new.html.twig', array(
+			'entity' => $entity,
+			'form'   => $form->createView(),
+		));
+	}
 
-        $form->add('submit', 'submit', array('label' => 'Create'));
+	/**
+	 * Creates a form to create a Job entity.
+	 *
+	 * @param Job $entity The entity
+	 *
+	 * @return \Symfony\Component\Form\Form The form
+	 */
+	private function createCreateForm(Job $entity)
+	{
+		$form = $this->createForm(new JobType(), $entity, array(
+			'action' => $this->generateUrl('nuno_job_create'),
+			'method' => 'POST',
+		));
 
-        return $form;
-    }
+		$form->add('submit', 'submit', array('label' => 'Create'));
 
-    /**
-     * Displays a form to create a new Job entity.
-     *
-     */
-    public function newAction()
-    {
-        $entity = new Job();
-        $form   = $this->createCreateForm($entity);
+		return $form;
+	}
 
-        return $this->render('NunoJobeetBundle:Job:new.html.twig', array(
-            'entity' => $entity,
-            'form'   => $form->createView(),
-        ));
-    }
+	/**
+	 * Displays a form to create a new Job entity.
+	 *
+	 */
+	public function newAction()
+	{
+		$entity = new Job();
+		$form   = $this->createCreateForm($entity);
 
-    /**
-     * Finds and displays a Job entity.
-     *
-     */
-    public function showAction($id)
-    {
-        $em = $this->getDoctrine()->getManager();
+		return $this->render('NunoJobeetBundle:Job:new.html.twig', array(
+			'entity' => $entity,
+			'form'   => $form->createView(),
+		));
+	}
 
-        $entity = $em->getRepository('NunoJobeetBundle:Job')->find($id);
+	/**
+	 * Finds and displays a Job entity.
+	 *
+	 */
+	public function showAction($id)
+	{
+		$em = $this->getDoctrine()->getManager();
 
-        if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Job entity.');
-        }
+		$entity = $em->getRepository('NunoJobeetBundle:Job')->getActiveJob($id);
 
-        $deleteForm = $this->createDeleteForm($id);
+		if (!$entity) {
+			throw $this->createNotFoundException('Unable to find Job entity.');
+		}
 
-        return $this->render('NunoJobeetBundle:Job:show.html.twig', array(
-            'entity'      => $entity,
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
+		$deleteForm = $this->createDeleteForm($id);
 
-    /**
-     * Displays a form to edit an existing Job entity.
-     *
-     */
-    public function editAction($id)
-    {
-        $em = $this->getDoctrine()->getManager();
+		return $this->render('NunoJobeetBundle:Job:show.html.twig', array(
+			'entity'      => $entity,
+			'delete_form' => $deleteForm->createView(),
+		));
+	}
 
-        $entity = $em->getRepository('NunoJobeetBundle:Job')->find($id);
+	/**
+	 * Displays a form to edit an existing Job entity.
+	 *
+	 */
+	public function editAction($id)
+	{
+		$em = $this->getDoctrine()->getManager();
 
-        if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Job entity.');
-        }
+		$entity = $em->getRepository('NunoJobeetBundle:Job')->find($id);
 
-        $editForm = $this->createEditForm($entity);
-        $deleteForm = $this->createDeleteForm($id);
+		if (!$entity) {
+			throw $this->createNotFoundException('Unable to find Job entity.');
+		}
 
-        return $this->render('NunoJobeetBundle:Job:edit.html.twig', array(
-            'entity'      => $entity,
-            'edit_form'   => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
+		$editForm = $this->createEditForm($entity);
+		$deleteForm = $this->createDeleteForm($id);
 
-    /**
-    * Creates a form to edit a Job entity.
-    *
-    * @param Job $entity The entity
-    *
-    * @return \Symfony\Component\Form\Form The form
-    */
-    private function createEditForm(Job $entity)
-    {
-        $form = $this->createForm(new JobType(), $entity, array(
-            'action' => $this->generateUrl('nuno_job_update', array('id' => $entity->getId())),
-            'method' => 'PUT',
-        ));
+		return $this->render('NunoJobeetBundle:Job:edit.html.twig', array(
+			'entity'      => $entity,
+			'edit_form'   => $editForm->createView(),
+			'delete_form' => $deleteForm->createView(),
+		));
+	}
 
-        $form->add('submit', 'submit', array('label' => 'Update'));
+	/**
+	* Creates a form to edit a Job entity.
+	*
+	* @param Job $entity The entity
+	*
+	* @return \Symfony\Component\Form\Form The form
+	*/
+	private function createEditForm(Job $entity)
+	{
+		$form = $this->createForm(new JobType(), $entity, array(
+			'action' => $this->generateUrl('nuno_job_update', array('id' => $entity->getId())),
+			'method' => 'PUT',
+		));
 
-        return $form;
-    }
-    /**
-     * Edits an existing Job entity.
-     *
-     */
-    public function updateAction(Request $request, $id)
-    {
-        $em = $this->getDoctrine()->getManager();
+		$form->add('submit', 'submit', array('label' => 'Update'));
 
-        $entity = $em->getRepository('NunoJobeetBundle:Job')->find($id);
+		return $form;
+	}
 
-        if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Job entity.');
-        }
+	/**
+	 * Edits an existing Job entity.
+	 *
+	 */
+	public function updateAction(Request $request, $id)
+	{
+		$em = $this->getDoctrine()->getManager();
 
-        $deleteForm = $this->createDeleteForm($id);
-        $editForm = $this->createEditForm($entity);
-        $editForm->handleRequest($request);
+		$entity = $em->getRepository('NunoJobeetBundle:Job')->find($id);
 
-        if ($editForm->isValid()) {
-            $em->flush();
+		if (!$entity) {
+			throw $this->createNotFoundException('Unable to find Job entity.');
+		}
 
-            return $this->redirect($this->generateUrl('nuno_job_edit', array('id' => $id)));
-        }
+		$deleteForm = $this->createDeleteForm($id);
+		$editForm = $this->createEditForm($entity);
+		$editForm->handleRequest($request);
 
-        return $this->render('NunoJobeetBundle:Job:edit.html.twig', array(
-            'entity'      => $entity,
-            'edit_form'   => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-    /**
-     * Deletes a Job entity.
-     *
-     */
-    public function deleteAction(Request $request, $id)
-    {
-        $form = $this->createDeleteForm($id);
-        $form->handleRequest($request);
+		if ($editForm->isValid()) {
+			$em->flush();
 
-        if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository('NunoJobeetBundle:Job')->find($id);
+			return $this->redirect($this->generateUrl('nuno_job_edit', array('id' => $id)));
+		}
 
-            if (!$entity) {
-                throw $this->createNotFoundException('Unable to find Job entity.');
-            }
+		return $this->render('NunoJobeetBundle:Job:edit.html.twig', array(
+			'entity'      => $entity,
+			'edit_form'   => $editForm->createView(),
+			'delete_form' => $deleteForm->createView(),
+		));
+	}
 
-            $em->remove($entity);
-            $em->flush();
-        }
+	/**
+	 * Deletes a Job entity.
+	 *
+	 */
+	public function deleteAction(Request $request, $id)
+	{
+		$form = $this->createDeleteForm($id);
+		$form->handleRequest($request);
 
-        return $this->redirect($this->generateUrl('nuno_job'));
-    }
+		if ($form->isValid()) {
+			$em = $this->getDoctrine()->getManager();
+			$entity = $em->getRepository('NunoJobeetBundle:Job')->find($id);
 
-    /**
-     * Creates a form to delete a Job entity by id.
-     *
-     * @param mixed $id The entity id
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm($id)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('nuno_job_delete', array('id' => $id)))
-            ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
-            ->getForm()
-        ;
-    }
+			if (!$entity) {
+				throw $this->createNotFoundException('Unable to find Job entity.');
+			}
+
+			$em->remove($entity);
+			$em->flush();
+		}
+
+		return $this->redirect($this->generateUrl('nuno_job'));
+	}
+
+	/**
+	 * Creates a form to delete a Job entity by id.
+	 *
+	 * @param mixed $id The entity id
+	 *
+	 * @return \Symfony\Component\Form\Form The form
+	 */
+	private function createDeleteForm($id)
+	{
+		return $this->createFormBuilder()
+			->setAction($this->generateUrl('nuno_job_delete', array('id' => $id)))
+			->setMethod('DELETE')
+			->add('submit', 'submit', array('label' => 'Delete'))
+			->getForm()
+		;
+	}
 }
